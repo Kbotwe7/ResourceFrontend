@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Bookings - Admin</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🔧 Admin Portal</h2>
+    <div class="nav-links">
+      <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
+      <a href="view-bookings.html" class="nav-link">View Bookings</a>
+      <a href="manage-resources.html" class="nav-link">Manage Resources</a>
+      <a href="index.html" class="nav-link">⬅ Back to Login</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="content-bubble">
+      <h1>📋 Manage Bookings</h1>
+      
+      <div class="admin-filters">
+        <input type="text" class="form-input" placeholder="Search by student name or resource..." id="searchInput">
+        <select class="form-input" id="statusFilter">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
+      <div id="noBookingsMessage" style="display: none; text-align: center; padding: 2rem;">
+        <p style="color: #666; font-size: 1.1rem;">No bookings found</p>
+      </div>
+
+      <div class="booking-cards" id="bookingsList">
+        <!-- Bookings will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load bookings from localStorage
+    function loadBookings() {
+      try {
+        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        
+        const enrichedBookings = bookings.map(booking => {
+          const user = users.find(u => u.id === booking.user_id);
+          return {
+            ...booking,
+            studentName: user ? user.name : 'Unknown User'
+          };
+        });
+
+        const filteredBookings = enrichedBookings.filter(booking => {
+          const matchesSearch = booking.resource_name.toLowerCase().includes(searchInput) ||
+                             booking.studentName.toLowerCase().includes(searchInput);
+          const matchesStatus = statusFilter === 'all' || booking.status.toLowerCase() === statusFilter.toLowerCase();
+          return matchesSearch && matchesStatus;
+        });
+
+        const bookingsList = document.getElementById('bookingsList');
+        const noBookingsMessage = document.getElementById('noBookingsMessage');
+
+        if (filteredBookings.length === 0) {
+          bookingsList.style.display = 'none';
+          noBookingsMessage.style.display = 'block';
+          return;
+        }
+
+        bookingsList.style.display = 'grid';
+        noBookingsMessage.style.display = 'none';
+        bookingsList.innerHTML = '';
+
+        filteredBookings.forEach(booking => {
+          const bookingCard = document.createElement('div');
+          bookingCard.className = 'booking-card';
+          bookingCard.innerHTML = `
+            <div class="booking-card-header">
+              <h3 class="booking-card-title">${booking.resource_name}</h3>
+              <span class="booking-card-status ${booking.status.toLowerCase()}">${booking.status}</span>
+            </div>
+            <div class="booking-card-details">
+              <p class="booking-card-detail"><strong>Student:</strong> ${booking.studentName}</p>
+              <p class="booking-card-detail"><strong>Category:</strong> ${booking.resource_category}</p>
+              <p class="booking-card-detail"><strong>Date:</strong> ${new Date(booking.start_time).toLocaleDateString()}</p>
+              <p class="booking-card-detail"><strong>Time:</strong> ${new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              <p class="booking-card-detail"><strong>Duration:</strong> ${Math.round((new Date(booking.end_time) - new Date(booking.start_time)) / (1000 * 60 * 60))} hours</p>
+              <p class="booking-card-detail"><strong>Purpose:</strong> ${booking.purpose || 'Not specified'}</p>
+            </div>
+            <div class="booking-card-actions">
+              ${booking.status.toLowerCase() === 'pending' ? `
+                <button class="btn-mini primary" onclick="updateBookingStatus('${booking.id}', 'Approved')">
+                  <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-mini danger" onclick="updateBookingStatus('${booking.id}', 'Rejected')">
+                  <i class="fas fa-times"></i> Reject
+                </button>
+              ` : ''}
+              <button class="btn-mini warning" onclick="deleteBooking('${booking.id}')">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          `;
+          bookingsList.appendChild(bookingCard);
+        });
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+        const bookingsList = document.getElementById('bookingsList');
+        bookingsList.innerHTML = '<p class="error-message">Failed to load bookings. Please try again later.</p>';
+      }
+    }
+
+    // Update booking status
+    function updateBookingStatus(bookingId, newStatus) {
+      try {
+        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+        
+        if (bookingIndex !== -1) {
+          bookings[bookingIndex].status = newStatus;
+          localStorage.setItem('bookings', JSON.stringify(bookings));
+          alert(`Booking ${newStatus.toLowerCase()} successfully`);
+          loadBookings();
+        } else {
+          throw new Error('Booking not found');
+        }
+      } catch (error) {
+        console.error('Error updating booking status:', error);
+        alert('Failed to update booking status');
+      }
+    }
+
+    // Delete booking
+    function deleteBooking(bookingId) {
+      if (!confirm('Are you sure you want to delete this booking? This action cannot be undone.')) return;
+      
+      try {
+        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        const filteredBookings = bookings.filter(b => b.id !== bookingId);
+        localStorage.setItem('bookings', JSON.stringify(filteredBookings));
+        alert('Booking deleted successfully');
+        loadBookings();
+      } catch (error) {
+        console.error('Error deleting booking:', error);
+        alert('Failed to delete booking');
+      }
+    }
+
+    // Add event listeners for filters
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const statusFilter = document.getElementById('statusFilter');
+
+      if (searchInput && statusFilter) {
+        searchInput.addEventListener('input', loadBookings);
+        statusFilter.addEventListener('change', loadBookings);
+      }
+
+      // Initial load
+      loadBookings();
+    });
+  </script>
+</body>
+</html> 

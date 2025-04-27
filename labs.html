@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Labs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🎓 Student Portal</h2>
+    <div class="nav-links">
+      <a href="student-dashboard.html" class="nav-link">Dashboard</a>
+      <span id="studentNameDisplay" class="nav-link"></span>
+      <a href="index.html" class="nav-link">Logout</a>
+    </div>
+  </div>
+
+  <div class="top-nav">
+    <button onclick="navigateTo('rooms.html')">Rooms</button>
+    <button onclick="navigateTo('equipment.html')">Equipment</button>
+    <button onclick="navigateTo('recreational.html')">Recreational</button>
+    <button onclick="navigateTo('labs.html')" class="active">Labs</button>
+    <button onclick="navigateTo('study.html')">Study Aids</button>
+  </div>
+
+  <div class="container">
+    <h1>Reserve a Lab</h1>
+    <div class="resource-grid">
+      <div class="card">
+        <img src="images/Labs/lab2.jpg" alt="Engineering Lab" />
+        <div class="card-content">
+          <h3>Engineering Lab</h3>
+          <p>Hands-on lab for engineering students</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Labs/pyshicslab.jpg" alt="Physics Lab" />
+        <div class="card-content">
+          <h3>Physics Lab</h3>
+          <p>Advanced physics experiments</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Labs/media lab.jpg" alt="Media Lab" />
+        <div class="card-content">
+          <h3>Media Lab</h3>
+          <p>Digital media and design workspace</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+        // Display student name
+        document.getElementById('studentNameDisplay').textContent = `Welcome, ${currentUser.name}`;
+    });
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const bookButtons = document.querySelectorAll(".book-btn");
+
+      bookButtons.forEach(button => {
+        button.addEventListener("click", function () {
+          const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+          if (!currentUser) {
+            alert('Please log in to make a booking');
+            window.location.href = 'student-login.html';
+            return;
+          }
+
+          const card = this.closest(".card");
+          const labName = card.querySelector("h3").textContent.trim();
+          const status = card.querySelector(".status").textContent.trim();
+
+          try {
+            // Store booking information in sessionStorage
+            sessionStorage.setItem("resourceName", labName);
+            sessionStorage.setItem("resourceCategory", "Lab");
+            
+            // Navigate to booking page
+            window.location.href = "booking.html";
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to process booking. Please try again.');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

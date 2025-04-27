@@ -1,0 +1,142 @@
+<!-- recreational.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recreational</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🎓 Student Portal</h2>
+    <div class="nav-links">
+      <a href="student-dashboard.html" class="nav-link">Dashboard</a>
+      <span id="studentNameDisplay" class="nav-link"></span>
+      <a href="index.html" class="nav-link">Logout</a>
+    </div>
+  </div>
+
+  <div class="top-nav">
+    <button onclick="navigateTo('rooms.html')">Rooms</button>
+    <button onclick="navigateTo('equipment.html')">Equipment</button>
+    <button onclick="navigateTo('recreational.html')" class="active">Recreational</button>
+    <button onclick="navigateTo('labs.html')">Labs</button>
+    <button onclick="navigateTo('study.html')">Study Aids</button>
+  </div>
+
+  <div class="container">
+    <h1>Recreational Facilities</h1>
+    <div class="resource-grid">
+      <div class="card">
+        <img src="images/Recreational/tabletennis1.jpg" alt="Table Tennis" />
+        <div class="card-content">
+          <h3>Table Tennis</h3>
+          <p>Professional table tennis setup</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Recreational/ps5_1.webp" alt="Gaming Station" />
+        <div class="card-content">
+          <h3>Gaming Station</h3>
+          <p>PS5 gaming setup with 4K display</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Recreational/ps4.jpg" alt="PS4 Gaming Station" />
+        <div class="card-content">
+          <h3>PS4 Gaming Station</h3>
+          <p>PS4 gaming setup with HD display</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Recreational/pool.jpg" alt="Pool Table" />
+        <div class="card-content">
+          <h3>Pool Table</h3>
+          <p>Professional pool table setup</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Recreational/chess2.webp" alt="Chess Set" />
+        <div class="card-content">
+          <h3>Chess Set</h3>
+          <p>Professional chess board and pieces</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Recreational/uno.webp" alt="Uno Game" />
+        <div class="card-content">
+          <h3>Uno Game</h3>
+          <p>Complete Uno card game set</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+        // Display student name
+        document.getElementById('studentNameDisplay').textContent = `Welcome, ${currentUser.name}`;
+    });
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+  
+    // Handle Book Now clicks
+    document.addEventListener("DOMContentLoaded", function () {
+      const bookButtons = document.querySelectorAll(".book-btn");
+  
+      bookButtons.forEach(button => {
+        button.addEventListener("click", function () {
+          const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+          if (!currentUser) {
+              alert('Please log in to make a booking');
+              window.location.href = 'student-login.html';
+              return;
+          }
+
+          const card = this.closest(".card");
+          const itemName = card.querySelector("h3").textContent.trim();
+          const status = card.querySelector(".status").textContent.trim();
+  
+          try {
+            // Store booking information in sessionStorage
+            sessionStorage.setItem("resourceName", itemName);
+            sessionStorage.setItem("resourceCategory", "Recreational");
+            
+            // Navigate to booking page
+            window.location.href = "booking.html";
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to process booking. Please try again.');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

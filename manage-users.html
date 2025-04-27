@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Users</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🔧 Admin Portal</h2>
+    <div class="nav-links">
+      <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
+      <a href="view-bookings.html" class="nav-link">View Bookings</a>
+      <a href="manage-resources.html" class="nav-link">Manage Resources</a>
+      <a href="manage-users.html" class="nav-link active">Manage Users</a>
+      <a href="index.html" class="nav-link">⬅ Back to Login</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="content-bubble">
+      <h1>👥 Manage Users</h1>
+      
+      <div class="user-filters">
+        <input type="text" id="searchUser" class="form-input" placeholder="Search users...">
+        <select id="roleFilter" class="form-input">
+          <option value="">All Roles</option>
+          <option value="student">Students</option>
+          <option value="admin">Admins</option>
+        </select>
+      </div>
+
+      <div class="user-table-container">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userList">
+            <!-- Users will be populated here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load users from localStorage
+    function loadUsers() {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userList = document.getElementById('userList');
+      userList.innerHTML = '';
+
+      users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${user.id}</td>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.role}</td>
+          <td><span class="status ${user.status}">${user.status}</span></td>
+          <td>
+            <button class="btn-mini" onclick="editUser('${user.id}')">Edit</button>
+            <button class="btn-mini danger" onclick="deleteUser('${user.id}')">Delete</button>
+            <button class="btn-mini ${user.status === 'active' ? 'warning' : 'success'}" 
+                    onclick="toggleUserStatus('${user.id}')">
+              ${user.status === 'active' ? 'Deactivate' : 'Activate'}
+            </button>
+          </td>
+        `;
+        userList.appendChild(row);
+      });
+    }
+
+    // Edit user
+    function editUser(userId) {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        const newName = prompt('Enter new name:', user.name);
+        const newEmail = prompt('Enter new email:', user.email);
+        const newRole = prompt('Enter new role (student/admin):', user.role);
+        
+        if (newName && newEmail && newRole) {
+          user.name = newName;
+          user.email = newEmail;
+          user.role = newRole;
+          localStorage.setItem('users', JSON.stringify(users));
+          loadUsers();
+        }
+      }
+    }
+
+    // Delete user
+    function deleteUser(userId) {
+      if (confirm('Are you sure you want to delete this user?')) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const updatedUsers = users.filter(u => u.id !== userId);
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+        loadUsers();
+      }
+    }
+
+    // Toggle user status
+    function toggleUserStatus(userId) {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        user.status = user.status === 'active' ? 'inactive' : 'active';
+        localStorage.setItem('users', JSON.stringify(users));
+        loadUsers();
+      }
+    }
+
+    // Search and filter users
+    document.getElementById('searchUser').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const roleFilter = document.getElementById('roleFilter').value;
+      const rows = document.querySelectorAll('#userList tr');
+      
+      rows.forEach(row => {
+        const name = row.cells[1].textContent.toLowerCase();
+        const role = row.cells[3].textContent.toLowerCase();
+        const matchesSearch = name.includes(searchTerm);
+        const matchesRole = !roleFilter || role === roleFilter;
+        row.style.display = matchesSearch && matchesRole ? '' : 'none';
+      });
+    });
+
+    document.getElementById('roleFilter').addEventListener('change', function(e) {
+      document.getElementById('searchUser').dispatchEvent(new Event('input'));
+    });
+
+    // Load users when page loads
+    document.addEventListener('DOMContentLoaded', loadUsers);
+  </script>
+</body>
+</html> 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🔧 Admin Portal</h2>
+    <!-- <div class="nav-links">
+      <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
+      <a href="view-bookings.html" class="nav-link">View Bookings</a>
+      <a href="add-resource.html" class="nav-link">Add Resource</a>
+      <a href="index.html" class="nav-link">⬅ Back to Login</a>
+    </div> -->
+  </div>
+
+  <div class="container center">
+    <h1>Welcome to Admin Dashboard</h1>
+    <p class="subtitle">Manage and monitor all campus resources</p>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="resource-card" onclick="location.href='view-bookings.html'">
+      <h3>📋 View Bookings</h3>
+      <p>Monitor and manage all resource bookings.</p>
+    </div>
+    <div class="resource-card" onclick="location.href='add-resource.html'">
+      <h3>➕ Add Resources</h3>
+      <p>Add new rooms, equipment, or facilities.</p>
+    </div>
+    <div class="resource-card" onclick="location.href='manage-resources.html'">
+      <h3>🔧 Manage Resources</h3>
+      <p>Edit or remove existing resources.</p>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

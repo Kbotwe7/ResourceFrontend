@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Login</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="form-bubble">
+      <h1>🎓 Student Login</h1>
+      <p class="subtitle">Login to your account or create a new one</p>
+
+      <form id="studentLoginForm">
+        <div class="form-group">
+          <input type="text" id="studentId" placeholder="Student ID" required class="form-input"/>
+        </div>
+        <div class="form-group">
+          <input type="password" id="password" placeholder="Password" required class="form-input"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Login</button>
+      </form>
+
+      <div class="form-footer">
+        <p>Don't have an account? <a href="student-signup.html">Sign up here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-button">
+    <a href="index.html">⬅ Back to Home</a>
+  </div>
+
+  <script type="module">
+    import dataService from './js/dataService.js';
+
+    document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      console.log('Login form submitted');
+      
+      const studentId = document.getElementById('studentId').value;
+      const password = document.getElementById('password').value;
+      
+      console.log('Attempting login for student:', studentId);
+      
+      try {
+        const user = dataService.getUserByUsername(studentId);
+        console.log('Found user:', user);
+        
+        if (!user || user.password !== password) {
+          console.log('Invalid credentials');
+          throw new Error('Invalid credentials');
+        }
+        
+        // Store user info in sessionStorage
+        const userData = {
+          id: user.id,
+          name: user.name,
+          role: user.role
+        };
+        console.log('Storing user data:', userData);
+        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+        
+        console.log('Redirecting to dashboard...');
+        window.location.href = 'student-dashboard.html';
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Invalid credentials. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html> 

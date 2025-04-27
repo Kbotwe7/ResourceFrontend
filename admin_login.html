@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="form-bubble">
+      <h1>🔐 Admin Login</h1>
+      <p class="subtitle">Only authorized personnel can access this page</p>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <input type="text" id="admin-username" placeholder="Username" required class="form-input"/>
+        </div>
+        <div class="form-group">
+          <input type="password" id="admin-password" placeholder="Password" required class="form-input"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="back-button">
+    <a href="index.html">⬅ Back to Login</a>
+  </div>
+
+  <script>
+    document.getElementById('adminLoginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const username = document.getElementById('admin-username').value.trim();
+      const password = document.getElementById('admin-password').value.trim();
+
+      if (username === "admin" && password === "admin") {
+        window.location.href = "admin-dashboard.html";
+      } else {
+        alert("Invalid admin credentials!");
+      }
+    });
+  </script>
+</body>
+</html>

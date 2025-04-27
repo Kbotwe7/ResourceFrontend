@@ -1,0 +1,135 @@
+<!-- study.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Study Aids</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🎓 Student Portal</h2>
+    <div class="nav-links">
+      <a href="student-dashboard.html" class="nav-link">Dashboard</a>
+      <span id="studentNameDisplay" class="nav-link"></span>
+      <a href="index.html" class="nav-link">Logout</a>
+    </div>
+  </div>
+
+  <div class="top-nav">
+    <button onclick="navigateTo('rooms.html')">Rooms</button>
+    <button onclick="navigateTo('equipment.html')">Equipment</button>
+    <button onclick="navigateTo('recreational.html')">Recreational</button>
+    <button onclick="navigateTo('labs.html')">Labs</button>
+    <button onclick="navigateTo('study.html')" class="active">Study Aids</button>
+  </div>
+
+  <div class="container">
+    <h1>Study Aids</h1>
+    <div class="resource-grid">
+      <div class="card">
+        <img src="images/Studyaids/Dr.-Navel-Kishore-Sharma.jpg" alt="Dr. Navel Kishore Sharma" class="study-aid-img" />
+        <div class="card-content">
+          <h3>Dr. Navel Kishore Sharma</h3>
+          <p>Mathematics Professor </p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Studyaids/juluis.jpg" alt="Julius" class="study-aid-img" style="object-position: center 40%;" />
+        <div class="card-content">
+          <h3>Julius Amegadzie </h3>
+          <p>Computer Science  Professor</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Studyaids/mahama.jpg" alt="Mahama" class="study-aid-img" style="object-position: center 30%;" />
+        <div class="card-content">
+          <h3>John Mahama</h3>
+          <p>Political Science Proffessor </p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+     
+
+      <div class="card">
+        <img src="images/Studyaids/Ebo kwansa-botwe.jpg" alt="Ebo Kwansa-Botwe" class="study-aid-img" style="object-position: center 30%;" />
+        <div class="card-content">
+          <h3>Ebo Kwansa-Botwe</h3>
+          <p>Game Developer</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <img src="images/Studyaids/Maame pyschcology.jpg" alt="Maame" class="study-aid-img" style="object-position: center 39%;" />
+        <div class="card-content">
+          <h3>Maame Korama Botwe</h3>
+          <p>Psychology Professor</p>
+          <p class="status available">Available</p>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <script>
+    // Check if user is logged in
+    document.addEventListener('DOMContentLoaded', function() { 
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+        // Display student name
+        document.getElementById('studentNameDisplay').textContent = `Welcome, ${currentUser.name}`;
+    });
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+  
+    // Handle Book Now clicks
+    document.addEventListener("DOMContentLoaded", function () {
+      const bookButtons = document.querySelectorAll(".book-btn");
+  
+      bookButtons.forEach(button => {
+        button.addEventListener("click", function () {
+          const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+          if (!currentUser) {
+              alert('Please log in to make a booking');
+              window.location.href = 'student-login.html';
+              return;
+          }
+
+          const card = this.closest(".card");
+          const resourceName = card.querySelector("h3").textContent.trim();
+          const status = card.querySelector(".status").textContent.trim();
+  
+          try {
+            // Store booking information in sessionStorage
+            sessionStorage.setItem("resourceName", resourceName);
+            sessionStorage.setItem("resourceCategory", "Study Aid");
+            
+            // Navigate to booking page
+            window.location.href = "booking.html";
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to process booking. Please try again.');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

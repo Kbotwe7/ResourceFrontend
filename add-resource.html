@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Resource</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🔧 Admin Portal</h2>
+    <div class="nav-links">
+      <a href="admin-dashboard.html" class="nav-link">Dashboard</a>
+      <a href="view-bookings.html" class="nav-link">View Bookings</a>
+      <a href="add-resource.html" class="nav-link">Add Resource</a>
+      <a href="index.html" class="nav-link">⬅ Back to Login</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="content-bubble">
+      <h1>➕ Add New Resource</h1>
+      <form id="addResourceForm" class="resource-form">
+        <div class="form-group">
+          <label for="resourceName">Resource Name</label>
+          <input type="text" id="resourceName" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label for="resourceType">Resource Type</label>
+          <select id="resourceType" class="form-input" required>
+            <option value="">Select Type</option>
+            <option value="room">Room</option>
+            <option value="equipment">Equipment</option>
+            <option value="lab">Lab</option>
+            <option value="recreational">Recreational</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="resourceDescription">Description</label>
+          <textarea id="resourceDescription" class="form-input" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="resourceCapacity">Capacity (if applicable)</label>
+          <input type="number" id="resourceCapacity" class="form-input" min="1" />
+        </div>
+        <div class="form-group">
+          <label for="resourceLocation">Location</label>
+          <input type="text" id="resourceLocation" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label for="resourceImage">Image URL</label>
+          <input type="url" id="resourceImage" class="form-input" />
+        </div>
+        <button type="submit" class="btn btn-primary">Add Resource</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('addResourceForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      try {
+        // Get existing resources or initialize empty array
+        const resources = JSON.parse(localStorage.getItem('resources') || '[]');
+        
+        // Create new resource object
+        const newResource = {
+          id: Date.now().toString(), // Generate unique ID
+          name: document.getElementById('resourceName').value,
+          type: document.getElementById('resourceType').value,
+          description: document.getElementById('resourceDescription').value,
+          capacity: document.getElementById('resourceCapacity').value ? 
+            parseInt(document.getElementById('resourceCapacity').value) : null,
+          location: document.getElementById('resourceLocation').value,
+          image_url: document.getElementById('resourceImage').value || null,
+          status: 'Available'
+        };
+
+        // Add new resource to array
+        resources.push(newResource);
+
+        // Save back to localStorage
+        localStorage.setItem('resources', JSON.stringify(resources));
+
+        alert('Resource added successfully!');
+        window.location.href = 'manage-resources.html';
+      } catch (error) {
+        console.error('Error adding resource:', error);
+        alert('Failed to add resource. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>

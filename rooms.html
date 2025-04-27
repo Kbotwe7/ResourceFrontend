@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-nav">
+        <h2>🎓 Student Portal</h2>
+        <div class="nav-links">
+            <a href="student-dashboard.html" class="nav-link">Dashboard</a>
+            <span id="studentNameDisplay" class="nav-link"></span>
+            <a href="index.html" class="nav-link">Logout</a>
+        </div>
+    </div>
+
+    <div class="top-nav">
+        <button onclick="navigateTo('rooms.html')" class="active">Rooms</button>
+        <button onclick="navigateTo('equipment.html')">Equipment</button>
+        <button onclick="navigateTo('recreational.html')">Recreational</button>
+        <button onclick="navigateTo('labs.html')">Labs</button>
+        <button onclick="navigateTo('study.html')">Study Aids</button>
+    </div>
+
+    <div class="container">
+        <h1>Available Rooms</h1>
+        <div class="resource-grid">
+            <div class="card">
+                <img src="images/rooms/lectureroom.jpg" alt="Lecture Room">
+                <div class="card-content">
+                    <h3>Lecture Room</h3>
+                    <p>Located in Block A, Ground Floor</p>
+                    <p class="status available">Available</p>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <img src="images/rooms/lecture2.jpg" alt="Lecture Room 2">
+                <div class="card-content">
+                    <h3>Lecture Room 2</h3>
+                    <p>Located in Block A, First Floor</p>
+                    <p class="status available">Available</p>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <img src="images/rooms/lecture3.jpg" alt="Lecture Room 3">
+                <div class="card-content">
+                    <h3>Lecture Room 3</h3>
+                    <p>Located in Block B, Ground Floor</p>
+                    <p class="status booked">Available</p>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <img src="images/rooms/classroom.jpg" alt="Classroom">
+                <div class="card-content">
+                    <h3>Classroom</h3>
+                    <p>Located in Block B, First Floor</p>
+                    <p class="status available">Available</p>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <img src="images/rooms/artroom.jpg" alt="Art Room">
+                <div class="card-content">
+                    <h3>Art Room</h3>
+                    <p>Located in Block C, Ground Floor</p>
+                    <p class="status available">Available</p>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+
+           
+            <div class="card">
+                <img src="images/rooms/kitchen.webp" alt="Kitchen">
+                <div class="card-content">
+                    <h3>Kitchen</h3>
+                    <p>Located in Block D, Ground Floor</p>
+                    <p class="status available">Available</p>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="images/rooms/gym.jpg" alt="Gym">
+                <div class="card-content">
+                    <h3>Gym</h3>
+                    <p>Located in Block D, First Floor</p>
+                    <p class="status available">Available</p>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            // Display student name
+            document.getElementById('studentNameDisplay').textContent = `Welcome, ${currentUser.name}`;
+        });
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const bookButtons = document.querySelectorAll(".book-btn");
+
+            bookButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                    if (!currentUser) {
+                        alert('Please log in to make a booking');
+                        window.location.href = 'student-login.html';
+                        return;
+                    }
+
+                    const card = this.closest(".card");
+                    const roomName = card.querySelector("h3").textContent.trim();
+                    const status = card.querySelector(".status").textContent.trim();
+
+                    try {
+                        // Store booking information in sessionStorage
+                        sessionStorage.setItem("resourceName", roomName);
+                        sessionStorage.setItem("resourceCategory", "Room");
+                        
+                        // Navigate to booking page
+                        window.location.href = "booking.html";
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Failed to process booking. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

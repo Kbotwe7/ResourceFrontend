@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Confirmation</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .confirmation-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .confirmation-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    .confirmation-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .confirmation-details {
+      display: grid;
+      gap: 1.5rem;
+    }
+    .detail-group {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    .detail-label {
+      font-weight: 500;
+      color: #495057;
+    }
+    .detail-value {
+      color: #212529;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+    }
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .btn-container {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🎓 Student Portal</h2>
+    <div class="nav-links">
+      <a href="student-dashboard.html" class="nav-link">Dashboard</a>
+      <span id="studentNameDisplay" class="nav-link"></span>
+      <a href="index.html" class="nav-link">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="confirmation-container">
+      <div class="confirmation-card">
+        <div class="confirmation-header">
+          <h1>Booking Confirmation</h1>
+          <p>Your booking has been successfully created!</p>
+        </div>
+
+        <div class="confirmation-details">
+          <div class="detail-group">
+            <span class="detail-label">Resource:</span>
+            <span class="detail-value" id="resourceName"></span>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Category:</span>
+            <span class="detail-value" id="resourceCategory"></span>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Date:</span>
+            <span class="detail-value" id="bookingDate"></span>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Time:</span>
+            <span class="detail-value" id="bookingTime"></span>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Duration:</span>
+            <span class="detail-value" id="bookingDuration"></span>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Purpose:</span>
+            <span class="detail-value" id="bookingPurpose"></span>
+          </div>
+          <div class="detail-group">
+            <span class="detail-label">Status:</span>
+            <span class="status-badge status-pending" id="bookingStatus">Pending</span>
+          </div>
+        </div>
+
+        <div class="btn-container">
+          <a href="student-dashboard.html" class="btn btn-primary">View My Bookings</a>
+          <a href="rooms.html" class="btn btn-secondary">Book Another Resource</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+      if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+      }
+      // Display student name
+      document.getElementById('studentNameDisplay').textContent = `Welcome, ${currentUser.name}`;
+
+      // Get booking details from sessionStorage
+      const booking = JSON.parse(sessionStorage.getItem('lastBooking'));
+      if (!booking) {
+        alert('No booking found. Please make a booking first.');
+        window.location.href = 'student-dashboard.html';
+        return;
+      }
+
+      // Display booking details
+      document.getElementById('resourceName').textContent = booking.resource_name;
+      document.getElementById('resourceCategory').textContent = booking.resource_category;
+      
+      const startDate = new Date(booking.start_time);
+      document.getElementById('bookingDate').textContent = startDate.toLocaleDateString();
+      document.getElementById('bookingTime').textContent = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      const duration = Math.round((new Date(booking.end_time) - startDate) / (1000 * 60 * 60));
+      document.getElementById('bookingDuration').textContent = `${duration} hour${duration > 1 ? 's' : ''}`;
+      
+      document.getElementById('bookingPurpose').textContent = booking.purpose;
+      document.getElementById('bookingStatus').textContent = booking.status;
+    });
+  </script>
+</body>
+</html>

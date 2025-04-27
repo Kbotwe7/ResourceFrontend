@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="admin-nav">
+    <h2>🎓 Student Portal</h2>
+    <div class="nav-links">
+      <a href="student-dashboard.html" class="nav-link active">Dashboard</a>
+      <span id="studentNameDisplay" class="nav-link"></span>
+      <a href="index.html" class="nav-link">Logout</a>
+    </div>
+  </div>
+
+  <div class="container center">
+    <h1>Welcome, <span id="studentName">Student</span>!</h1>
+    <p class="subtitle">Explore and book available campus resources below.</p>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="resource-card" onclick="window.location.href='rooms.html'">
+      <h3>Rooms</h3>
+      <p>Book study and lecture rooms.</p>
+    </div>
+    <div class="resource-card" onclick="window.location.href='equipment.html'">
+      <h3>Equipment</h3>
+      <p>Reserve projectors, cameras, and more.</p>
+    </div>
+    <div class="resource-card" onclick="window.location.href='labs.html'">
+      <h3>Labs</h3>
+      <p>Access science, engineering, or IT labs.</p>
+    </div>
+    <div class="resource-card" onclick="window.location.href='recreational.html'">
+      <h3>Recreational</h3>
+      <p>Book games and chill zones (PS5, pool).</p>
+    </div>
+    <div class="resource-card" onclick="window.location.href='study.html'">
+      <h3>Study Aids</h3>
+      <p>Reserve Teachers Teaching Assistants or Students.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="content-bubble">
+      <h1>📋 My Bookings</h1>
+      <div class="booking-filters">
+        <input type="text" id="searchInput" class="form-input" placeholder="Search my bookings...">
+        <select id="statusFilter" class="form-input">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div id="bookingsList" class="booking-cards"></div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+        // Display student name
+        const studentName = currentUser.name || 'Student';
+        document.getElementById('studentName').textContent = studentName;
+        document.getElementById('studentNameDisplay').textContent = `Welcome, ${studentName}`;
+        
+        // Load bookings
+        loadMyBookings();
+    });
+
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    // Load user's bookings
+    async function loadMyBookings() {
+      try {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+          throw new Error('User not logged in');
+        }
+
+        // Get all bookings from localStorage
+        const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        // Filter bookings for current student
+        const studentBookings = allBookings.filter(booking => booking.user_id === currentUser.id);
+        
+        const searchInput = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+
+        // Apply filters
+        const filteredBookings = studentBookings.filter(booking => {
+          const matchesSearch = booking.resource_name.toLowerCase().includes(searchInput);
+          const matchesStatus = !statusFilter || booking.status.toLowerCase() === statusFilter;
+          return matchesSearch && matchesStatus;
+        });
+
+        const bookingsList = document.getElementById('bookingsList');
+        
+        if (bookingsList) {
+          if (filteredBookings.length === 0) {
+            bookingsList.innerHTML = '<p class="no-bookings">You have no bookings yet. Start by booking a resource above!</p>';
+            return;
+          }
+
+          bookingsList.innerHTML = filteredBookings.map(booking => `
+            <div class="booking-card">
+              <h3 class="booking-card-title">${booking.resource_name}</h3>
+              <div class="booking-card-detail">
+                <strong>Category:</strong> ${booking.resource_category}
+              </div>
+              <div class="booking-card-detail">
+                <strong>Date:</strong> ${new Date(booking.start_time).toLocaleDateString()}
+              </div>
+              <div class="booking-card-detail">
+                <strong>Time:</strong> ${new Date(booking.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
+              <div class="booking-card-detail">
+                <strong>Duration:</strong> ${Math.round((new Date(booking.end_time) - new Date(booking.start_time)) / (1000 * 60 * 60))} hours
+              </div>
+              <div class="booking-card-detail">
+                <strong>Purpose:</strong> ${booking.purpose || 'Not specified'}
+              </div>
+              <div class="booking-card-status status ${booking.status.toLowerCase()}">
+                ${booking.status}
+              </div>
+              ${booking.status === 'Pending' || booking.status === 'Approved' ? `
+                <div class="booking-card-actions">
+                  <button onclick="cancelBooking('${booking.id}')" class="btn-mini danger">Cancel</button>
+                </div>
+              ` : ''}
+            </div>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        const bookingsList = document.getElementById('bookingsList');
+        if (bookingsList) {
+          bookingsList.innerHTML = '<p class="error-message">Failed to load bookings. Please try again later.</p>';
+        }
+      }
+    }
+
+    // Cancel booking
+    async function cancelBooking(bookingId) {
+      if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+      try {
+        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        const bookingIndex = bookings.findIndex(b => b.id === bookingId);
+        
+        if (bookingIndex !== -1) {
+          bookings[bookingIndex].status = 'Cancelled';
+          localStorage.setItem('bookings', JSON.stringify(bookings));
+          alert('Booking cancelled successfully');
+          loadMyBookings();
+        } else {
+          throw new Error('Booking not found');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to cancel booking');
+      }
+    }
+
+    // Add event listeners for filters
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const statusFilter = document.getElementById('statusFilter');
+
+      if (searchInput && statusFilter) {
+        searchInput.addEventListener('input', loadMyBookings);
+        statusFilter.addEventListener('change', loadMyBookings);
+      }
+    });
+  </script>
+</body>
+</html>
